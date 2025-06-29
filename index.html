@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kisaragi Station</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier Prime', monospace;
+            background: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e);
+            background-size: 400% 400%;
+            animation: backgroundShift 20s ease infinite;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        @keyframes backgroundShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 0, 0.03) 2px,
+                rgba(0, 255, 0, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            animation: scanlineFlicker 2s linear infinite;
+        }
+        
+        @keyframes scanlineFlicker {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.4; }
+        }
+        
+        .game-container {
+            max-width: 800px;
+            width: 90%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #ff6b6b;
+            text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px rgba(255, 107, 107, 0.5); }
+            to { text-shadow: 0 0 30px rgba(255, 107, 107, 0.8), 0 0 40px rgba(255, 107, 107, 0.3); }
+        }
+        
+        .scene-text {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            min-height: 150px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #4ecdc4;
+            border-radius: 5px;
+        }
+        
+        .glitch {
+            position: relative;
+            animation: glitch 2s infinite;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            animation: glitch-1 0.5s infinite;
+            color: #ff00ff;
+            z-index: -1;
+        }
+        
+        .glitch::after {
+            animation: glitch-2 0.5s infinite;
+            color: #00ffff;
+            z-index: -2;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+        
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(2px, -2px); }
+            40% { transform: translate(-2px, 2px); }
+            60% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+        }
+        
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, -2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(-2px, 2px); }
+        }
+        
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .choice-btn {
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            color: #e0e0e0;
+            border: 2px solid #4ecdc4;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            font-family: 'Courier Prime', monospace;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .choice-btn:hover {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+        
+        .choice-btn:active {
+            transform: translateY(0);
+        }
+        
+        .inventory {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            min-width: 150px;
+        }
+        
+        .inventory-title {
+            color: #4ecdc4;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .inventory-item {
+            color: #ff6b6b;
+            margin: 2px 0;
+        }
+        
+        .status {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #ffd700;
+        }
+        
+        @media (max-width: 600px) {
+            .game-container {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            .scene-text {
+                font-size: 1em;
+                min-height: 120px;
+            }
+            
+            .inventory {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    
+    <div class="game-container">
+        <h1 class="title">KISARAGI STATION</h1>
+        
+        <div class="inventory">
+            <div class="inventory-title">INVENTORY</div>
+            <div id="inventory-items"></div>
+        </div>
+        
+        <div class="scene-text" id="scene-text"></div>
+        
+        <div class="choices" id="choices"></div>
+        
+        <div class="status" id="status">
+            Loop: <span id="loop-count">1</span>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            currentScene: 'start',
+            inventory: [],
+            visitedScenes: [],
+            loopCount: 1,
+            hasKey: false,
+            metGhost: false,
+            timeDistortion: false
+        };
+
+        // Scene definitions
+        const scenes = {
+            start: {
+                text: "You awaken on the cold floor of a silent platform. The lights buzz overhead with an electric hum that seems to penetrate your skull. The digital clock displays frozen numbers: 25:61. The last train has long since gone, leaving only the lingering scent of metal and ozone.",
+                choices: [
+                    { text: "Look around", action: "lookAround" },
+                    { text: "Call for help", action: "callHelp" }
+                ]
+            },
+            
+            lookAround: {
+                text: "The platform stretches endlessly in both directions, disappearing into shadows that seem to writhe and shift when you're not looking directly at them. Yellow safety lines glow faintly, leading to nowhere. A single vending machine hums in the distance, its fluorescent display flickering between products that don't exist.",
+                choices: [
+                    { text: "Approach the vending machine", action: "vendingMachine" },
+                    { text: "Follow the yellow lines", action: "followLines" },
+                    { text: "Check the station map", action: "stationMap" }
+                ]
+            },
+            
+            callHelp: {
+                text: "\"HELLO?\" your voice echoes, but the sound returns wrong - distorted, as if spoken by someone else. The echo repeats: <span class='glitch' data-text='\"Hello... hello... help us...\"'>\"Hello... hello... help us...\"</span> You realize the voice answering isn't quite your own.",
+                choices: [
+                    { text: "Listen carefully to the echo", action: "listenEcho" },
+                    { text: "Try to find the exit", action: "findExit" },
+                    { text: "Stay quiet and observe", action: "stayQuiet" }
+                ]
+            },
+            
+            vendingMachine: {
+                text: "The vending machine displays impossible items: 'Forgotten Memories - ¥∞', 'Last Train Ticket - ¥404', 'Time Fragment - ¥??'. The coin slot accepts something, but you have no ordinary currency. Strange symbols flicker across the screen.",
+                choices: [
+                    { text: "Insert your train card", action: "insertCard" },
+                    { text: "Touch the screen displaying symbols", action: "touchScreen" },
+                    { text: "Walk away from the machine", action: "walkAway" }
+                ]
+            },
+            
+            followLines: {
+                text: "You follow the yellow lines deeper into the station. The fluorescent lights flicker in sequence, creating a strobe effect that makes your shadow dance. The lines begin to curve impossibly, leading upward along the walls. Gravity seems... negotiable here.",
+                choices: [
+                    { text: "Continue following the lines up the wall", action: "followUp" },
+                    { text: "Turn back before it's too late", action: "turnBack" },
+                    { text: "Touch the wall to test reality", action: "touchWall" }
+                ]
+            },
+            
+            stationMap: {
+                text: "The station map is a maze of impossible connections. Lines intersect through dimensions, and station names shift when you blink: 'Kisaragi', 'Nowhere Junction', 'The Last Stop', '∅∅∅∅∅'. Your current location blinks red: 'YOU ARE HERE... OR ARE YOU?'",
+                choices: [
+                    { text: "Trace the route to 'Kisaragi'", action: "traceRoute" },
+                    { text: "Look for an exit on the map", action: "findMapExit" },
+                    { text: "The map seems to be looking back at you", action: "mapStares" }
+                ]
+            },
+            
+            listenEcho: {
+                text: "You strain to listen. The echoes reveal fragments: <span class='glitch' data-text='\"...been here so long...\"'>\"...been here so long...\"</span> <span class='glitch' data-text='\"...the train never comes...\"'>\"...the train never comes...\"</span> <span class='glitch' data-text='\"...join us...\"'>\"...join us...\"</span> The voices multiply, overlapping into a chorus of the lost.",
+                choices: [
+                    { text: "Ask the voices who they are", action: "askVoices" },
+                    { text: "Try to escape the echoing voices", action: "escapeVoices" },
+                    { text: "Accept their invitation", action: "joinVoices" }
+                ]
+            },
+            
+            insertCard: {
+                text: "Your train card slides in with a satisfying click. The machine whirs, dispensing something impossible: a rusted key that feels older than the station itself. It's warm to the touch and seems to pulse with its own heartbeat.",
+                choices: [
+                    { text: "Examine the key closely", action: "examineKey" },
+                    { text: "Look for what the key might unlock", action: "findLock" },
+                    { text: "Keep the key but leave quickly", action: "keepKey" }
+                ],
+                onEnter: function() {
+                    gameState.inventory.push("Rusted Key");
+                    gameState.hasKey = true;
+                    updateInventory();
+                }
+            },
+            
+            touchScreen: {
+                text: "The moment your finger touches the screen, the symbols rearrange themselves into a message: <span class='glitch' data-text='WELCOME TO KISARAGI STATION'>WELCOME TO KISARAGI STATION</span>. The screen cracks, spider-webbing outward. Through the cracks, you glimpse another platform - one that looks exactly like this one, but occupied by shadowy figures.",
+                choices: [
+                    { text: "Try to communicate with the figures", action: "communicate" },
+                    { text: "Break the screen completely", action: "breakScreen" },
+                    { text: "Step back and observe", action: "observeScreen" }
+                ]
+            },
+            
+            examineKey: {
+                text: "The key bears an inscription in a script that shifts between languages: 'Platform 9¾', 'Track ∞', 'The Door That Should Not Be'. As you watch, rust flakes away to reveal gleaming metal underneath. It's becoming newer, or perhaps time is running backward.",
+                choices: [
+                    { text: "Search for Platform 9¾", action: "searchPlatform" },
+                    { text: "Find Track ∞", action: "findTrack" },
+                    { text: "Look for 'The Door That Should Not Be'", action: "findDoor" }
+                ]
+            },
+            
+            findDoor: {
+                text: "Behind the vending machine, you discover a door marked 'AUTHORIZED PERSONNEL ONLY'. The rusted key fits perfectly. Beyond lies a control room filled with monitors showing the same platform from different angles - but in each screen, you see yourself at different moments, making different choices.",
+                choices: [
+                    { text: "Watch the monitors closely", action: "watchMonitors" },
+                    { text: "Try to find the exit controls", action: "findControls" },
+                    { text: "Look for another way out", action: "findOtherExit" }
+                ]
+            },
+            
+            watchMonitors: {
+                text: "The monitors show your past selves making different decisions. In one, you never woke up. In another, you found a train that took you somewhere worse. A ghost-like figure appears on one screen - a station attendant who notices you watching and points directly at the camera. <span class='glitch' data-text='\"You cannot leave by watching,\"'>\"You cannot leave by watching,\"</span> their voice crackles through hidden speakers.",
+                choices: [
+                    { text: "Try to communicate with the attendant", action: "talkAttendant" },
+                    { text: "Smash the monitors", action: "smashMonitors" },
+                    { text: "Accept that you might be trapped", action: "acceptTrap" }
+                ]
+            },
+            
+            talkAttendant: {
+                text: "The ghostly attendant flickers into focus. <span class='glitch' data-text='\"Welcome to Kisaragi Station,\"'>\"Welcome to Kisaragi Station,\"</span> they say with a sad smile. <span class='glitch' data-text='\"The train you seek runs on different tracks now. But I can offer you a choice: Reset the loop, or step off the platform into the unknown.\"'>\"The train you seek runs on different tracks now. But I can offer you a choice: Reset the loop, or step off the platform into the unknown.\"</span>",
+                choices: [
+                    { text: "Reset the loop", action: "resetLoop" },
+                    { text: "Step off the platform", action: "stepOff" },
+                    { text: "Ask about the other passengers", action: "askPassengers" }
+                ],
+                onEnter: function() {
+                    gameState.metGhost = true;
+                }
+            },
+            
+            resetLoop: {
+                text: "Reality blurs. The station resets, but you retain fragments of memory - echoes of choices made and unmade. You find yourself back on the cold platform floor, but this time you know the truth: you're not the first to wake up here, and you won't be the last.",
+                choices: [
+                    { text: "Try to break the cycle", action: "breakCycle" },
+                    { text: "Embrace the repetition", action: "embraceLoop" },
+                    { text: "Look for other trapped souls", action: "findOthers" }
+                ],
+                onEnter: function() {
+                    gameState.loopCount++;
+                    gameState.timeDistortion = true;
+                    updateStatus();
+                }
+            },
+            
+            stepOff: {
+                text: "You step off the platform into the void between worlds. The sensation is like falling upward through liquid darkness. When you emerge, you're standing on a street you don't recognize, but the air tastes of freedom. Behind you, Kisaragi Station fades like a half-remembered dream. You've escaped, but part of you will always wonder about those you left behind.",
+                choices: [
+                    { text: "Walk toward the lights ahead", action: "walkLights" },
+                    { text: "Turn back one last time", action: "lastLook" },
+                    { text: "Keep the key as a reminder", action: "keepReminder" }
+                ]
+            },
+            
+            walkLights: {
+                text: "The lights resolve into a familiar city street. Normal traffic flows past normal people living normal lives. Your phone has signal again, showing dozens of missed calls from worried friends. According to the timestamp, you've been missing for three days, but it felt like hours. The rusted key in your pocket is the only proof it wasn't all a dream.",
+                choices: [
+                    { text: "Call your friends back", action: "callFriends" },
+                    { text: "Research Kisaragi Station online", action: "research" },
+                    { text: "Try to forget and move on", action: "forgetAndMove" }
+                ]
+            },
+            
+            research: {
+                text: "Online forums buzz with stories of Kisaragi Station - a urban legend of commuters who board the wrong train and end up at a station that doesn't exist. Most dismiss it as fiction, but you find testimonies that match your experience eerily well. One post, dated just hours ago, reads: 'If you're reading this, you made it out. Some of us are still trying to find the way home.'",
+                choices: [
+                    { text: "Reply to help others escape", action: "helpOthers" },
+                    { text: "Share your own story", action: "shareStory" },
+                    { text: "Close the laptop and never look back", action: "neverLookBack" }
+                ]
+            },
+            
+            helpOthers: {
+                text: "You create a detailed guide for escaping Kisaragi Station, sharing every detail you remember. Over the following weeks, you receive messages from people claiming your advice helped them escape similar situations. You've become an unofficial guide for the lost, helping souls find their way home from places that shouldn't exist. The rusted key remains warm in your pocket, a reminder that some doors, once opened, can never be fully closed.",
+                choices: [
+                    { text: "Continue helping others", action: "continueHelping" },
+                    { text: "Start a support group", action: "startGroup" },
+                    { text: "Begin again", action: "start" }
+                ]
+            }
+        };
+
+        // Core game functions
+        function updateInventory() {
+            const inventoryElement = document.getElementById('inventory-items');
+            if (gameState.inventory.length === 0) {
+                inventoryElement.textContent = 'Empty';
+            } else {
+                inventoryElement.innerHTML = gameState.inventory.map(item => 
+                    `<div class="inventory-item">${item}</div>`
+                ).join('');
+            }
+        }
+
+        function updateStatus() {
+            document.getElementById('loop-count').textContent = gameState.loopCount;
+        }
+
+        function displayScene(sceneId) {
+            const scene = scenes[sceneId];
+            if (!scene) return;
+
+            gameState.currentScene = sceneId;
+            gameState.visitedScenes.push(sceneId);
+
+            // Execute scene's onEnter function if it exists
+            if (scene.onEnter) {
+                scene.onEnter();
+            }
+
+            // Update scene text with typing effect
+            const sceneTextElement = document.getElementById('scene-text');
+            const choicesElement = document.getElementById('choices');
+            
+            sceneTextElement.innerHTML = '';
+            choicesElement.innerHTML = '';
+
+            // Typing effect
+            let i = 0;
+            const typeWriter = () => {
+                if (i < scene.text.length) {
+                    sceneTextElement.innerHTML += scene.text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 30);
+                } else {
+                    // Show choices after text is fully typed
+                    setTimeout(() => displayChoices(scene.choices), 500);
+                }
+            };
+            typeWriter();
+        }
+
+        function displayChoices(choices) {
+            const choicesElement = document.getElementById('choices');
+            
+            choices.forEach((choice, index) => {
+                const button = document.createElement('button');
+                button.className = 'choice-btn';
+                button.textContent = choice.text;
+                button.onclick = () => makeChoice(choice.action);
+                
+                // Staggered appearance
+                setTimeout(() => {
+                    button.style.opacity = '0';
+                    button.style.transform = 'translateY(20px)';
+                    choicesElement.appendChild(button);
+                    
+                    setTimeout(() => {
+                        button.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        button.style.opacity = '1';
+                        button.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+        }
+
+        function makeChoice(action) {
+            // Add screen flicker effect
+            document.body.style.filter = 'brightness(1.5) contrast(1.2)';
+            setTimeout(() => {
+                document.body.style.filter = 'none';
+            }, 100);
+
+            displayScene(action);
+        }
+
+        // Initialize game
+        function initGame() {
+            updateInventory();
+            updateStatus();
+            displayScene('start');
+        }
+
+        // Start the game when page loads
+        window.onload = initGame;
+
+        // Add ambient sound effects (visual feedback)
+        document.addEventListener('click', () => {
+            document.body.style.boxShadow = 'inset 0 0 100px rgba(0, 255, 0, 0.1)';
+            setTimeout(() => {
+                document.body.style.boxShadow = 'none';
+            }, 200);
+        });
+    </script>
+</body>
+</html>
