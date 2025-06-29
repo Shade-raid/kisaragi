@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kisaragi Station</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Courier+Prime:wght@400;700&display=swap');
         
         * {
             margin: 0;
@@ -15,9 +15,9 @@
         
         body {
             font-family: 'Courier Prime', monospace;
-            background: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e);
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0d2e 25%, #16213e 50%, #0f3460 75%, #0a0a0a 100%);
             background-size: 400% 400%;
-            animation: backgroundShift 20s ease infinite;
+            animation: backgroundShift 30s ease infinite;
             color: #e0e0e0;
             min-height: 100vh;
             display: flex;
@@ -30,8 +30,36 @@
         
         @keyframes backgroundShift {
             0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 50% 100%; }
+            75% { background-position: 0% 50%; }
             100% { background-position: 0% 50%; }
+        }
+        
+        /* Enhanced visual effects */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/></filter></defs><rect width="100" height="100" filter="url(%23noiseFilter)" opacity="0.05"/></svg>');
+            pointer-events: none;
+            z-index: 5;
+            animation: noiseMovement 0.5s infinite;
+        }
+        
+        @keyframes noiseMovement {
+            0%, 100% { transform: translate(0px, 0px); }
+            10% { transform: translate(-5px, -5px); }
+            20% { transform: translate(-10px, 5px); }
+            30% { transform: translate(5px, -10px); }
+            40% { transform: translate(-5px, 15px); }
+            50% { transform: translate(-10px, 5px); }
+            60% { transform: translate(15px, 0px); }
+            70% { transform: translate(0px, 10px); }
+            80% { transform: translate(-15px, 0px); }
+            90% { transform: translate(10px, 5px); }
         }
         
         .scanlines {
@@ -40,63 +68,253 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 255, 0, 0.03) 2px,
-                rgba(0, 255, 0, 0.03) 4px
-            );
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 255, 0.03) 2px,
+                    rgba(0, 255, 255, 0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 100px,
+                    rgba(255, 0, 255, 0.02) 100px,
+                    rgba(255, 0, 255, 0.02) 102px
+                );
             pointer-events: none;
-            z-index: 1000;
-            animation: scanlineFlicker 2s linear infinite;
+            z-index: 10;
+            animation: scanlineFlicker 3s linear infinite;
         }
         
         @keyframes scanlineFlicker {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.4; }
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 0.3; }
         }
         
-        .game-container {
-            max-width: 800px;
-            width: 90%;
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #333;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 0 50px rgba(0, 255, 0, 0.1);
+        .chromatic-aberration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+            background: radial-gradient(circle at center, transparent 40%, rgba(255, 0, 0, 0.01) 70%, rgba(0, 255, 0, 0.01) 80%, rgba(0, 0, 255, 0.01) 90%);
+            animation: chromaticShift 8s ease-in-out infinite;
+        }
+        
+        @keyframes chromaticShift {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.02); opacity: 0.1; }
+        }
+        
+        /* Menu Styles */
+        .menu-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            transition: opacity 0.8s ease;
+        }
+        
+        .menu-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 4em;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffc3a0);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 6s ease infinite, titlePulse 4s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.1em;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .menu-subtitle {
+            font-size: 1.2em;
+            color: #888;
+            text-align: center;
+            margin-bottom: 50px;
+            font-style: italic;
+            animation: subtitleFade 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes subtitleFade {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+        
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .menu-btn {
+            background: linear-gradient(135deg, rgba(30, 30, 60, 0.8), rgba(20, 40, 80, 0.8));
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            color: #e0e0e0;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.4s ease;
             position: relative;
-            z-index: 10;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            min-width: 250px;
+            text-align: center;
+        }
+        
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .menu-btn:hover::before {
+            left: 100%;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 10px 30px rgba(78, 205, 196, 0.3),
+                inset 0 0 20px rgba(78, 205, 196, 0.1);
+            border-color: #4ecdc4;
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(68, 160, 141, 0.2));
+        }
+        
+        .menu-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        /* Enhanced Game Container */
+        .game-container {
+            max-width: 900px;
+            width: 90%;
+            background: 
+                linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 40, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%);
+            border: 3px solid transparent;
+            background-clip: padding-box;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 
+                0 0 60px rgba(0, 255, 255, 0.15),
+                inset 0 0 60px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(78, 205, 196, 0.3);
+            position: relative;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+        }
+        
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            border-radius: 20px;
+            z-index: -1;
+            animation: borderGlow 8s ease infinite;
+        }
+        
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
         }
         
         .title {
             text-align: center;
-            font-size: 2.5em;
+            font-family: 'Orbitron', monospace;
+            font-size: 2.8em;
+            font-weight: 900;
             margin-bottom: 30px;
-            color: #ff6b6b;
-            text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
-            animation: titleGlow 3s ease-in-out infinite alternate;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            animation: titleGlow 4s ease-in-out infinite alternate;
+            letter-spacing: 0.05em;
         }
         
         @keyframes titleGlow {
-            from { text-shadow: 0 0 20px rgba(255, 107, 107, 0.5); }
-            to { text-shadow: 0 0 30px rgba(255, 107, 107, 0.8), 0 0 40px rgba(255, 107, 107, 0.3); }
+            from { 
+                text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+                transform: scale(1);
+            }
+            to { 
+                text-shadow: 0 0 40px rgba(255, 107, 107, 0.8), 0 0 60px rgba(78, 205, 196, 0.3);
+                transform: scale(1.02);
+            }
         }
         
         .scene-text {
-            font-size: 1.2em;
-            line-height: 1.8;
-            margin-bottom: 30px;
-            min-height: 150px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
+            font-size: 1.3em;
+            line-height: 1.9;
+            margin-bottom: 35px;
+            min-height: 180px;
+            padding: 25px;
+            background: 
+                linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(20, 30, 60, 0.4) 50%, rgba(0, 0, 0, 0.6) 100%);
             border-left: 4px solid #4ecdc4;
-            border-radius: 5px;
+            border-radius: 10px;
+            box-shadow: inset 0 0 20px rgba(78, 205, 196, 0.1);
+            position: relative;
+        }
+        
+        .scene-text::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(78, 205, 196, 0.05) 50%, transparent 51%);
+            pointer-events: none;
         }
         
         .glitch {
             position: relative;
             animation: glitch 2s infinite;
+            color: #ff6b6b;
+            font-weight: bold;
         }
         
         .glitch::before,
@@ -148,93 +366,221 @@
         .choices {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 18px;
         }
         
         .choice-btn {
-            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            background: linear-gradient(135deg, rgba(30, 30, 60, 0.8), rgba(20, 40, 80, 0.8));
             color: #e0e0e0;
-            border: 2px solid #4ecdc4;
-            padding: 15px 25px;
-            font-size: 1.1em;
+            border: 2px solid rgba(78, 205, 196, 0.5);
+            padding: 18px 30px;
+            font-size: 1.2em;
             font-family: 'Courier Prime', monospace;
             cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.3s ease;
+            border-radius: 10px;
+            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+        
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(78, 205, 196, 0.3), transparent);
+            transition: left 0.6s;
+        }
+        
+        .choice-btn:hover::before {
+            left: 100%;
         }
         
         .choice-btn:hover {
-            background: linear-gradient(45deg, #4ecdc4, #44a08d);
-            color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.3), rgba(68, 160, 141, 0.3));
+            color: #fff;
+            transform: translateY(-3px) translateX(5px);
+            box-shadow: 
+                0 8px 25px rgba(78, 205, 196, 0.4),
+                inset 0 0 20px rgba(78, 205, 196, 0.1);
+            border-color: #4ecdc4;
         }
         
         .choice-btn:active {
-            transform: translateY(0);
+            transform: translateY(-1px) translateX(2px);
         }
         
         .inventory {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 0.9em;
-            min-width: 150px;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(20, 20, 40, 0.9));
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1em;
+            min-width: 180px;
+            border: 2px solid rgba(78, 205, 196, 0.3);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
         }
         
         .inventory-title {
             color: #4ecdc4;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
+            font-family: 'Orbitron', monospace;
+            text-align: center;
+            font-size: 0.9em;
+            letter-spacing: 0.1em;
         }
         
         .inventory-item {
             color: #ff6b6b;
-            margin: 2px 0;
+            margin: 4px 0;
+            padding: 3px 8px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 5px;
+            font-size: 0.9em;
+            animation: itemGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes itemGlow {
+            from { box-shadow: inset 0 0 5px rgba(255, 107, 107, 0.2); }
+            to { box-shadow: inset 0 0 10px rgba(255, 107, 107, 0.4); }
         }
         
         .status {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 0.9em;
+            bottom: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(20, 20, 40, 0.9));
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1em;
             color: #ffd700;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(10px);
+            font-family: 'Orbitron', monospace;
         }
         
-        @media (max-width: 600px) {
+        .back-to-menu {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.8), rgba(255, 107, 107, 0.6));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .back-to-menu:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-title {
+                font-size: 2.5em;
+            }
+            
             .game-container {
                 width: 95%;
-                padding: 20px;
+                padding: 25px;
             }
             
             .title {
-                font-size: 2em;
+                font-size: 2.2em;
             }
             
             .scene-text {
-                font-size: 1em;
-                min-height: 120px;
+                font-size: 1.1em;
+                min-height: 150px;
+                padding: 20px;
             }
             
-            .inventory {
+            .inventory, .status {
                 position: static;
                 margin-bottom: 20px;
+                width: 100%;
+            }
+            
+            .back-to-menu {
+                position: static;
+                margin-bottom: 20px;
+                align-self: flex-start;
+            }
+            
+            .menu-btn {
+                min-width: 200px;
+                font-size: 1.1em;
             }
         }
     </style>
 </head>
 <body>
+    <div class="noise"></div>
     <div class="scanlines"></div>
+    <div class="chromatic-aberration"></div>
     
-    <div class="game-container">
+    <!-- Main Menu -->
+    <div class="menu-container" id="main-menu">
+        <h1 class="menu-title">KISARAGI STATION</h1>
+        <p class="menu-subtitle">A liminal horror experience</p>
+        <div class="menu-buttons">
+            <button class="menu-btn" onclick="startGame()">BEGIN JOURNEY</button>
+            <button class="menu-btn" onclick="showAbout()">ABOUT</button>
+            <button class="menu-btn" onclick="showControls()">CONTROLS</button>
+        </div>
+    </div>
+    
+    <!-- About Screen -->
+    <div class="menu-container hidden" id="about-screen">
+        <h2 class="menu-title" style="font-size: 2.5em;">ABOUT</h2>
+        <div style="max-width: 600px; text-align: center; margin-bottom: 30px;">
+            <p style="font-size: 1.2em; line-height: 1.6; margin-bottom: 20px;">
+                Based on the Japanese urban legend, Kisaragi Station is a place that shouldn't exist - 
+                a phantom train station where lost souls find themselves trapped between realities.
+            </p>
+            <p style="font-size: 1em; line-height: 1.6; color: #888;">
+                Your choices matter. Every decision shapes your fate. Some paths lead to freedom, 
+                others to eternal repetition. Will you escape, or become another ghost in the station?
+            </p>
+        </div>
+        <button class="menu-btn" onclick="showMainMenu()">BACK</button>
+    </div>
+    
+    <!-- Controls Screen -->
+    <div class="menu-container hidden" id="controls-screen">
+        <h2 class="menu-title" style="font-size: 2.5em;">CONTROLS</h2>
+        <div style="max-width: 500px; text-align: left; margin-bottom: 30px;">
+            <p style="font-size: 1.1em; line-height: 1.8; margin-bottom: 15px;">
+                • <strong>Click</strong> on choices to make decisions<br>
+                • <strong>Read carefully</strong> - some text contains hidden clues<br>
+                • <strong>Track your inventory</strong> - items may be crucial later<br>
+                • <strong>Watch for glitched text</strong> - it often reveals truth<br>
+                • <strong>Multiple playthroughs</strong> reveal different paths
+            </p>
+        </div>
+        <button class="menu-btn" onclick="showMainMenu()">BACK</button>
+    </div>
+    
+    <!-- Game Container -->
+    <div class="game-container hidden" id="game-screen">
+        <button class="back-to-menu" onclick="showMainMenu()">← MENU</button>
+        
         <h1 class="title">KISARAGI STATION</h1>
         
         <div class="inventory">
@@ -247,7 +593,7 @@
         <div class="choices" id="choices"></div>
         
         <div class="status" id="status">
-            Loop: <span id="loop-count">1</span>
+            LOOP: <span id="loop-count">1</span>
         </div>
     </div>
 
@@ -263,7 +609,45 @@
             timeDistortion: false
         };
 
-        // Scene definitions
+        // UI Management
+        function showMainMenu() {
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('about-screen').classList.add('hidden');
+            document.getElementById('controls-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+        }
+
+        function showAbout() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('about-screen').classList.remove('hidden');
+        }
+
+        function showControls() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('controls-screen').classList.remove('hidden');
+        }
+
+        function startGame() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            // Reset game state
+            gameState = {
+                currentScene: 'start',
+                inventory: [],
+                visitedScenes: [],
+                loopCount: 1,
+                hasKey: false,
+                metGhost: false,
+                timeDistortion: false
+            };
+            
+            updateInventory();
+            updateStatus();
+            displayScene('start');
+        }
+
+        // Scene definitions (keeping all the original scenes)
         const scenes = {
             start: {
                 text: "You awaken on the cold floor of a silent platform. The lights buzz overhead with an electric hum that seems to penetrate your skull. The digital clock displays frozen numbers: 25:61. The last train has long since gone, leaving only the lingering scent of metal and ozone.",
@@ -347,6 +731,15 @@
                     { text: "Try to communicate with the figures", action: "communicate" },
                     { text: "Break the screen completely", action: "breakScreen" },
                     { text: "Step back and observe", action: "observeScreen" }
+                ]
+            },
+            
+            walkAway: {
+                text: "You turn away from the vending machine, but as you do, you hear a mechanical sound behind you. When you look back, a ticket has been dispensed - a one-way ticket to 'Kisaragi Station'. The destination is printed in red ink that seems to shimmer and move.",
+                choices: [
+                    { text: "Take the ticket", action: "takeTicket" },
+                    { text: "Leave the ticket and run", action: "runAway" },
+                    { text: "Study the ticket without touching it", action: "studyTicket" }
                 ]
             },
             
@@ -435,7 +828,59 @@
                 choices: [
                     { text: "Continue helping others", action: "continueHelping" },
                     { text: "Start a support group", action: "startGroup" },
-                    { text: "Begin again", action: "start" }
+                    { text: "Begin a new journey", action: "start" }
+                ]
+            },
+            
+            findExit: {
+                text: "You search desperately for an exit, but every corridor leads back to the same platform. The station seems to twist and reshape itself around you. Emergency exit signs point to doors that don't exist, and stairways that should lead up somehow descend deeper underground.",
+                choices: [
+                    { text: "Keep searching methodically", action: "keepSearching" },
+                    { text: "Follow your instincts", action: "followInstincts" },
+                    { text: "Sit down and think", action: "sitAndThink" }
+                ]
+            },
+            
+            stayQuiet: {
+                text: "You remain silent, listening to the ambient sounds of the station. The hum of electricity, the distant drip of water, and something else - a rhythmic tapping like morse code. As your eyes adjust, you notice the fluorescent lights are flickering in a pattern. Someone, or something, is trying to communicate.",
+                choices: [
+                    { text: "Try to decode the light pattern", action: "decodePattern" },
+                    { text: "Follow the sound of tapping", action: "followTapping" },
+                    { text: "Respond with your own pattern", action: "respondPattern" }
+                ]
+            },
+            
+            breakCycle: {
+                text: "With determination born of desperation, you refuse to accept the loop. You remember every choice, every path, every dead end. This time, you do something different - you close your eyes and walk backward through the station, retracing your steps in reverse. The world protests, reality groans, but something gives way. When you open your eyes, you're standing in front of a train that definitely wasn't there before.",
+                choices: [
+                    { text: "Board the mysterious train", action: "boardTrain" },
+                    { text: "Examine the train first", action: "examineTrain" },
+                    { text: "This feels like another trap", action: "suspectTrap" }
+                ]
+            },
+            
+            boardTrain: {
+                text: "The train doors open with a pneumatic hiss. Inside, the seats are filled with passengers who don't quite look real - their edges blur, their faces shift when you're not looking directly at them. The conductor, a figure in a uniform that seems to be made of shadow, nods at you. <span class='glitch' data-text='\"All aboard the reality express,\"'>\"All aboard the reality express,\"</span> they announce. <span class='glitch' data-text='\"Next stop: wherever you believe you're going.\"'>\"Next stop: wherever you believe you're going.\"</span>",
+                choices: [
+                    { text: "Believe you're going home", action: "believeHome" },
+                    { text: "Believe you're going somewhere new", action: "believeNew" },
+                    { text: "Don't believe in anything", action: "believeNothing" }
+                ]
+            },
+            
+            believeHome: {
+                text: "You close your eyes and think of home - really think of it. The smell of coffee in the morning, the sound of traffic, the feeling of your own bed. When the train stops and you step off, you're at your neighborhood station. Everything is exactly as it should be, but you notice something in your reflection in the train window as it pulls away: your eyes now hold a depth that wasn't there before, as if you've seen beyond the veil of the ordinary world.",
+                choices: [
+                    { text: "Go home and try to resume normal life", action: "resumeNormal" },
+                    { text: "You're different now - embrace it", action: "embraceChange" },
+                    { text: "Return to the main menu", action: "mainMenu" }
+                ]
+            },
+            
+            mainMenu: {
+                text: "Thank you for playing Kisaragi Station. Your journey through the liminal space between realities has ended... for now. But remember - some doors, once opened, can never be fully closed. The station may call to you again.",
+                choices: [
+                    { text: "Return to Main Menu", action: "returnToMenu" }
                 ]
             }
         };
@@ -444,7 +889,7 @@
         function updateInventory() {
             const inventoryElement = document.getElementById('inventory-items');
             if (gameState.inventory.length === 0) {
-                inventoryElement.textContent = 'Empty';
+                inventoryElement.innerHTML = '<div style="color: #666; font-style: italic;">Empty</div>';
             } else {
                 inventoryElement.innerHTML = gameState.inventory.map(item => 
                     `<div class="inventory-item">${item}</div>`
@@ -460,6 +905,12 @@
             const scene = scenes[sceneId];
             if (!scene) return;
 
+            // Special handling for main menu return
+            if (sceneId === 'returnToMenu') {
+                showMainMenu();
+                return;
+            }
+
             gameState.currentScene = sceneId;
             gameState.visitedScenes.push(sceneId);
 
@@ -468,23 +919,32 @@
                 scene.onEnter();
             }
 
-            // Update scene text with typing effect
+            // Update scene text with enhanced typing effect
             const sceneTextElement = document.getElementById('scene-text');
             const choicesElement = document.getElementById('choices');
             
             sceneTextElement.innerHTML = '';
             choicesElement.innerHTML = '';
 
-            // Typing effect
+            // Enhanced typing effect
             let i = 0;
             const typeWriter = () => {
                 if (i < scene.text.length) {
                     sceneTextElement.innerHTML += scene.text.charAt(i);
                     i++;
-                    setTimeout(typeWriter, 30);
+                    
+                    // Add subtle screen flicker during typing
+                    if (Math.random() < 0.05) {
+                        document.body.style.filter = 'brightness(1.1) contrast(1.1)';
+                        setTimeout(() => {
+                            document.body.style.filter = 'none';
+                        }, 50);
+                    }
+                    
+                    setTimeout(typeWriter, 25);
                 } else {
                     // Show choices after text is fully typed
-                    setTimeout(() => displayChoices(scene.choices), 500);
+                    setTimeout(() => displayChoices(scene.choices), 800);
                 }
             };
             typeWriter();
@@ -499,48 +959,90 @@
                 button.textContent = choice.text;
                 button.onclick = () => makeChoice(choice.action);
                 
-                // Staggered appearance
+                // Staggered appearance with enhanced animation
                 setTimeout(() => {
                     button.style.opacity = '0';
-                    button.style.transform = 'translateY(20px)';
+                    button.style.transform = 'translateY(30px) rotateX(10deg)';
                     choicesElement.appendChild(button);
                     
                     setTimeout(() => {
-                        button.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        button.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
                         button.style.opacity = '1';
-                        button.style.transform = 'translateY(0)';
+                        button.style.transform = 'translateY(0) rotateX(0)';
                     }, 100);
-                }, index * 200);
+                }, index * 300);
             });
         }
 
         function makeChoice(action) {
-            // Add screen flicker effect
-            document.body.style.filter = 'brightness(1.5) contrast(1.2)';
+            // Enhanced screen effect
+            const body = document.body;
+            body.style.filter = 'brightness(1.8) contrast(1.5) saturate(0.8)';
+            body.style.transform = 'scale(1.01)';
+            
+            // Glitch effect
             setTimeout(() => {
-                document.body.style.filter = 'none';
-            }, 100);
+                body.style.filter = 'brightness(0.7) contrast(1.8) hue-rotate(90deg)';
+                body.style.transform = 'scale(0.99) rotateZ(0.5deg)';
+            }, 50);
+            
+            setTimeout(() => {
+                body.style.filter = 'none';
+                body.style.transform = 'none';
+                body.style.transition = 'all 0.3s ease';
+            }, 150);
 
-            displayScene(action);
+            setTimeout(() => {
+                displayScene(action);
+            }, 200);
+        }
+
+        // Enhanced ambient effects
+        function addAmbientEffects() {
+            document.addEventListener('click', (e) => {
+                // Ripple effect
+                const ripple = document.createElement('div');
+                ripple.style.position = 'fixed';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(78, 205, 196, 0.3)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.left = (e.clientX - 10) + 'px';
+                ripple.style.top = (e.clientY - 10) + 'px';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.zIndex = '9999';
+                
+                document.body.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
         }
 
         // Initialize game
         function initGame() {
             updateInventory();
             updateStatus();
-            displayScene('start');
+            addAmbientEffects();
+            
+            // Add ripple animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         }
 
         // Start the game when page loads
         window.onload = initGame;
-
-        // Add ambient sound effects (visual feedback)
-        document.addEventListener('click', () => {
-            document.body.style.boxShadow = 'inset 0 0 100px rgba(0, 255, 0, 0.1)';
-            setTimeout(() => {
-                document.body.style.boxShadow = 'none';
-            }, 200);
-        });
     </script>
 </body>
 </html>
